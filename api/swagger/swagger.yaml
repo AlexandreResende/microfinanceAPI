@@ -1,0 +1,512 @@
+swagger: "2.0"
+info:
+  version: "0.0.1"
+  title: Wallet API
+# during dev, should point to your local machine
+host: localhost:10010
+# basePath prefixes all resource paths 
+basePath: /
+# 
+schemes:
+  # tip: remove http to make production-grade
+  - http
+  - https
+# format of bodies a client can send (Content-Type)
+consumes:
+  - application/json
+  - application/x-www-form-urlencoded
+# format of the responses to the client (Accepts)
+produces:
+  - application/json
+paths:
+  /user:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: user.controller
+    post:
+      description: Sign up a specific user
+      # used as the method name of the controller
+      operationId: signUpUser
+      parameters:
+        - name: username
+          in: formData
+          description: The nickname of the user
+          required: true
+          type: string
+        - name: password
+          in: formData
+          description: The password of the user
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/SuccessMessage"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /authenticate:
+    # binds a127 app logic to a route
+    x-swagger-router-controller: user.controller
+    post:
+      description: Authenticate a specific user
+      # used as the method name of the controller
+      operationId: authenticateUser
+      parameters:
+        - name: username
+          in: formData
+          description: The nickname of the user
+          required: true
+          type: string
+        - name: password
+          in: formData
+          description: The password of the user
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/SuccessMessage"
+        "404":
+          description: User not found
+          schema:
+            # a pointer to a definition
+            $ref: "#/definitions/NotFoundResponse"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        # responses may fall through to errors
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /{userId}/wallet:
+    x-swagger-router-controller: wallet.controller
+    get:
+      description: Returns the wallet(s) of the user
+      operationId: getWallet
+      parameters:
+        - name: userId
+          in: path
+          description: The userId of the user
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessMessage"
+        "404":
+          description: User not found
+          schema:
+            $ref: "#/definitions/NotFoundResponse"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      description: Add a wallet to the user
+      operationId: addWallet
+      parameters:
+        - name: userId
+          in: path
+          description: The userId
+          required: true
+          type: string
+        - name: walletName
+          in: formData
+          description: The name of the wallet
+          required: false
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessMessage"
+        "404":
+          description: User not found
+          schema:
+            $ref: "#/definitions/NotFoundResponse"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /{walletId}/editWallet:
+    x-swagger-router-controller: wallet.controller
+    put:
+      description: Edit the information of the wallet
+      operationId: editWallet
+      parameters:
+        - name: walletId
+          in: path
+          description: The wallet id
+          required: true
+          type: string
+        - name: walletName
+          in: formData
+          description: The wallet name
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessMessage"
+        "404":
+          description: Wallet not found
+          schema:
+            $ref: "#/definitions/NotFoundResponse"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /{walletId}/removeWallet:
+    x-swagger-router-controller: wallet.controller
+    delete:
+      description: Remove a wallet
+      operationId: removeWallet
+      parameters:
+        - name: walletId
+          in: path
+          description: The wallet id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessMessage"
+        "404":
+          description: Wallet not found
+          schema:
+            $ref: "#/definitions/NotFoundResponse"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /{walletId}/setWalletLimit:
+    x-swagger-router-controller: wallet.controller
+    put:
+      description: Set the limit of a wallet
+      operationId: setWalletLimit
+      parameters:
+        - name: walletId
+          in: path
+          description: The wallet id
+          required: true
+          type: string
+        - name: limit
+          in: formData
+          description: The new limit of the wallet
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessMessage"
+        "404":
+          description: Wallet not found
+          schema:
+            $ref: "#/definitions/NotFoundResponse"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /{walletId}/purchase:
+    x-swagger-router-controller: wallet.controller
+    put:
+      description: Make a purchase in a wallet
+      operationId: purchase
+      parameters:
+        - name: walletId
+          in: path
+          description: The wallet id
+          required: true
+          type: string
+        - name: purchaseValue
+          in: formData
+          description: The new limit of the wallet
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessMessage"
+        "404":
+          description: Wallet not found
+          schema:
+            $ref: "#/definitions/NotFoundResponse"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /{walletId}/getCards:
+    x-swagger-router-controller: card.controller
+    get:
+      description: Returns the cards of a specific wallet
+      operationId: getCards
+      parameters:
+        - name: walletId
+          in: path
+          description: The wallet id of the user
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessMessage"
+        "404":
+          description: Wallet not found
+          schema:
+            $ref: "#/definitions/NotFoundResponse"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+    post:
+      description: Add a card in a specific wallet
+      operationId: addCard
+      parameters:
+        - name: walletId
+          in: path
+          description: The wallet id
+          required: true
+          type: string
+        - name: cardNumber
+          in: formData
+          description: The number of the card
+          required: true
+          type: string
+        - name: dueDate
+          in: formData
+          description: The last day when the credit card must be paid
+          required: true
+          type: integer
+        - name: expirationDate
+          in: formData
+          description: The expiration date of the card
+          required: true
+          type: string
+        - name: cvv
+          in: formData
+          description: The wallet id
+          required: true
+          type: string
+        - name: limit
+          in: formData
+          description: The wallet id
+          required: true
+          type: integer
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessMessage"
+        "404":
+          description: Wallet not found
+          schema:
+            $ref: "#/definitions/NotFoundResponse"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /{walletId}/{cardId}/editCard:
+    x-swagger-router-controller: card.controller
+    put:
+      description: Edit a card
+      operationId: editCard
+      parameters:
+        - name: walletId
+          in: path
+          description: The wallet id
+          required: true
+          type: string
+        - name: cardId
+          in: path
+          description: The card id
+          required: true
+          type: string
+        - name: cardNumber
+          in: formData
+          description: The number of the card
+          required: false
+          type: string
+        - name: dueDate
+          in: formData
+          description: The last day when the credit card must be paid
+          required: false
+          type: integer
+        - name: expirationDate
+          in: formData
+          description: The expiration date of the card (month/year)
+          required: false
+          type: string
+        - name: cvv
+          in: formData
+          description: The wallet id
+          required: false
+          type: string
+        - name: limit
+          in: formData
+          description: The wallet id
+          required: false
+          type: integer
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessMessage"
+        "404":
+          description: Cardo or wallet not found
+          schema:
+            $ref: "#/definitions/NotFoundResponse"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /{walletId}/{cardId}/removeCard:
+    x-swagger-router-controller: card.controller
+    delete:
+      description: Delete a card from a wallet
+      operationId: deleteCard
+      parameters:
+        - name: walletId
+          in: path
+          description: The wallet id
+          required: true
+          type: string
+        - name: cardId
+          in: path
+          description: The card id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessMessage"
+        "404":
+          description: Card or wallet not found
+          schema:
+            $ref: "#/definitions/NotFoundResponse"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"
+  /{walletId}/{cardId}/releaseCredit:
+    x-swagger-router-controller: card.controller
+    delete:
+      description: Release the credit of a card
+      operationId: releaseCredit
+      parameters:
+        - name: walletId
+          in: path
+          description: The wallet id
+          required: true
+          type: string
+        - name: cardId
+          in: path
+          description: The card id
+          required: true
+          type: string
+      responses:
+        "200":
+          description: Success
+          schema:
+            $ref: "#/definitions/SuccessMessage"
+        "404":
+          description: Card or wallet not found
+          schema:
+            $ref: "#/definitions/NotFoundResponse"
+        "500":
+          description: An error occurred
+          schema:
+            $ref: "#/definitions/InternalErrorMessage"
+        default:
+          description: Error
+          schema:
+            $ref: "#/definitions/ErrorResponse"      
+  /swagger:
+    x-swagger-pipe: swagger_raw
+# complex objects have schema definitions
+definitions:
+  ErrorResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+  
+  SuccessMessage:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+
+  NotFoundResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+
+  InternalErrorMessage:
+    required:
+      - message
+    properties:
+      message:
+        type: string
