@@ -30,7 +30,6 @@ module.exports.updateExpenses = (req, res) => {
 
   let expenseDAO = new ExpenseDAO(dbConnection.getDb());
   expenseDAO.updateExpenses(req, res, expenseId, updateInfo);
-
 };
 
 module.exports.removeExpenses = (req, res) => {

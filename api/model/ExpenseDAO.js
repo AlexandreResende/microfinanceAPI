@@ -8,7 +8,7 @@ function ExpenseDAO(connection){
 ExpenseDAO.prototype.getAllExpenses = function(req, res){
   let getExpenses;
   let userId = {
-    ownerId: ObjectId('597fccdb5623c9b346c275fd')//req.session.userId
+    ownerId: req.params.userId
   };
 
   let expensesColl = this._connection.collection('expenses');
@@ -35,7 +35,7 @@ ExpenseDAO.prototype.insertExpenses = function(req, res, expenseInfo){
   let insertExpenses;
   let expensesColl = this._connection.collection('expenses'); 
 
-  insertExpenses = new Promise((reject, resolve) => {
+  insertExpenses = new Promise((resolve, reject) => {
     expensesColl.insert(expenseInfo, (err, insertResult) => {
       if (err){
         reject(err);
@@ -49,16 +49,19 @@ ExpenseDAO.prototype.insertExpenses = function(req, res, expenseInfo){
     return res.status(201).send({msg: `Expense inserted`, result: insertResult});
   })
   .catch((err) => {
-    return res.status(500).send({error: `An error occurred. ${err}`});
+    return res.status(500).send({error: `An error occurred. ${JSON.stringify(err)}`});
   });
 }
 
-ExpenseDAO.prototype.updateExpenses = function(req, res, ExpenseId, updateInfo){
-  let updateExpenses;
+ExpenseDAO.prototype.updateExpenses = function(req, res, expenseId, updateInfo){
+  let updateExpense;
   let expensesColl = this._connection.collection('expenses');
 
-  updateExpenses = new Promise((reject, resolve) => {
-    expensesColl.update(ExpenseId, {$set: updateInfo}, (err, updateResult) => {
+  console.log(expenseId);
+  console.log(updateInfo);
+
+  updateExpense = new Promise((resolve, reject) => {
+    expensesColl.update(expenseId, {$set: updateInfo}, (err, updateResult) => {
       if (err){
         reject(err);
       }
@@ -66,18 +69,16 @@ ExpenseDAO.prototype.updateExpenses = function(req, res, ExpenseId, updateInfo){
     });
   });
 
-  updateExpenses
+  updateExpense
   .then((updateResult) => {
     return res.status(200).send({msg: `Expense updated`, result: updateResult});
   })
   .catch((err) => {
     return res.status(500).send({error: `An error occurred. ${err}`});
   });
-
 }
 
 ExpenseDAO.prototype.removeExpenses = function(req, res, ExpenseId){
-
   let removeExpenses;
   let expensesColl = this._connection.collection('expenses');
 
