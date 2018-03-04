@@ -1,10 +1,14 @@
+
 const express = require('express');
-const userController = require('../controllers/user.controller');
+const router = express.Router();
 
-let router = express.Router();
+const {
+  signUp,
+  login,
+} = require('../controllers/user.controller');
 
-router.post('/signup', userController.signUp);
+router.post('/signup', signUp);
 
-router.post('/login', userController.login);
+router.post('/login', login);
 
 module.exports = router;
