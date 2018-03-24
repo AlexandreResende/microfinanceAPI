@@ -1,8 +1,9 @@
+
 const SwaggerExpress = require('swagger-express-mw');
 const app = require('./config/server');
 const database = require('./config/database');
 
-var config = {
+const config = {
   appRoot: __dirname // required config
 };
 
@@ -22,3 +23,4 @@ database.connect( (err) => {
   });
 });
 
+module.exports = app;
